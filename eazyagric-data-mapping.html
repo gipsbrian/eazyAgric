@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <base href="/" />
+    <title>EazyAgric Farm Data</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script src="https://code.highcharts.com/maps/highmaps.js"></script>
+    <script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/mapdata/countries/ug/ug-all.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+      #container {
+        height: 500px;
+        min-width: 310px;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .loading {
+        margin-top: 10em;
+        text-align: center;
+        color: gray;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <button>Click to Load High Map</button>
+    <script>
+      $(document).ready(function () {
+        $("button").click(function () {
+          $.get("http://localhost:5000/api/v1/getJsonData", function (res) {
+            mapping(res.data);
+            alert("Data retrieved successfully");
+          });
+        });
+      });
+
+      function mapping(res) {
+        var array_convert = JSON.parse(res);
+
+        var mapFrame = array_convert.map((el) => {
+          return {
+            name: el.district,
+            z: el.number,
+          };
+        });
+
+        var data = mapFrame;
+
+        console.log(mapFrame);
+        // Create the chart
+        Highcharts.mapChart("container", {
+          chart: {
+            map: "countries/ug/ug-all",
+          },
+
+          title: {
+            text: "Highmaps basic demo",
+          },
+
+          mapNavigation: {
+            enabled: true,
+            buttonOptions: {
+              verticalAlign: "bottom",
+            },
+          },
+
+          colorAxis: {
+            min: 0,
+          },
+
+          series: [
+            {
+              data: data,
+              type: "map",
+              name: "Eazy Agric Farm Data",
+              joinBy: "name",
+              states: {
+                hover: {
+                  color: "#BADA55",
+                },
+              },
+              tooltip: {
+                pointFormat: "{point.properties.name}: {point.z}",
+              },
+            },
+          ],
+        });
+      }
+    </script>
+  </body>
+</html>
